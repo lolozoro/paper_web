@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻译内容展示</title>
+    <style>
+        body {
+            background-color: #d3d3d3; /* 亮灰色背景 */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header, .author, .content, .paper-meta, .paper-header, .translated {
+            background-color: #ffffff; /* 白色背景 */
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .author {
+            font-size: 18px;
+            color: #555555;
+        }
+        .content {
+            font-size: 16px;
+        }
+        .translated {
+            font-size: 16px;
+        }
+        .paper-meta {
+            font-size: 14px;
+            color: #555555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header" id="title">{{ papers.translated_title }}</div>
+    <div class="author" id="author">{{ papers.translated_authors }}</div>
+    <div class="content" id="abstract">{{ papers.translated_abstract }}</div>
+    <div class="paper-meta">
+        <a href="{{ papers.pdf_link }}" target="_blank">PDF URL</a>
+    </div>
+    <div class="translated" id="translated">{{ papers.translated|linebreaks }}</div>
+    <div class="paper-header">{{ papers.message }}</div>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papers List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr 1fr 1fr 1fr; /* 6列 */
+            background-color: #e0e0e0; /* 浅灰色背景 */
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .paper-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr 1fr 1fr 1fr; /* 6列，最后一列用于操作 */
+        }
+        .paper-item:last-child {
+            border-bottom: none;
+        }
+        .paper-header {
+            color: #333;
+        }
+        .paper-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination a {
+            text-decoration: none;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #333;
+        }
+        .pagination .active a {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>title</div>
+            <div>Author</div>
+            <div>Abstract</div>
+            <div>URL</div>
+            <div>comments</div>
+            <div>翻译</div>
+        </div>
+        {% for paper in papers %}
+            <div class="paper-item">
+                <div class="paper-header">{{ paper.title_translated }}</div>
+                <div class="paper-meta">{{ paper.authors }}</div>
+                <div class="paper-meta">{{ paper.abstract_translated }}</div>
+                <div class="paper-meta">
+                    <a href="{{ paper.pdf_link }}" target="_blank">PDF URL</a>
+                </div>
+                <div class="paper-meta">{{ paper.comments }}</div>
+                <div class="paper-meta">
+            <form method="POST" action="{% url 'translate_paper' %}" target="_blank" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="paper_title" value="{{ paper.title_translated }}">
+                <input type="hidden" name="pdf_link" value="{{ paper.pdf_link }}"> <!-- 添加隐藏输入字段获取PDF链接 -->
+                <input type="hidden" name="abstract" value="{{ paper.abstract_translated }}">
+                <input type="hidden" name="authors" value="{{ paper.authors }}">
+                <button type="submit">翻译</button>
+            </form>
+                </div>
+            </div>
+        {% empty %}
+        <div class="paper-header">{{ message }}</div>
+        {% endfor %}
+    </div>
+
+
+
+{% if total_pages > 1 %}
+<nav>
+    <ul class="pagination">
+        {% if current_page > 1 %}
+           <li><a href="?page={{ current_page|add:"-1" }}&pdaq_ip1={{ request.GET.pdaq_ip1 }}&pdaq_ip2={{ request.GET.pdaq_ip2 }}&pdaq_ip3={{ request.GET.pdaq_ip3 }}&pdaq_ip4={{ request.GET.pdaq_ip4 }}&pdaq_ip5={{ request.GET.pdaq_ip5 }}&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}">上一页</a></li>
+        {% endif %}
+
+        {% for i in displayed_pages %}
+            {% if i == '...' %}
+                <li class="dots">···</li>
+            {% else %}
+                    <li{% if i == current_page %} class="active"{% endif %}>
+                    <a href="?page={{ i }}&pdaq_ip1={{ request.GET.pdaq_ip1 }}&pdaq_ip2={{ request.GET.pdaq_ip2 }}&pdaq_ip3={{ request.GET.pdaq_ip3 }}&pdaq_ip4={{ request.GET.pdaq_ip4 }}&pdaq_ip5={{ request.GET.pdaq_ip5 }}&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}">{{ i }}</a>
+                </li>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if current_page < total_pages %}
+           <li><a href="?page={{ current_page|add:"1" }}&pdaq_ip1={{ request.GET.pdaq_ip1 }}&pdaq_ip2={{ request.GET.pdaq_ip2 }}&pdaq_ip3={{ request.GET.pdaq_ip3 }}&pdaq_ip4={{ request.GET.pdaq_ip4 }}&pdaq_ip5={{ request.GET.pdaq_ip5 }}&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}">下一页</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+</body>
+</html>

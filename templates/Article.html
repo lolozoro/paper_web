@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Data List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr 1fr 1fr;
+            background-color: #e0e0e0; /* 浅灰色背景 */
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .paper-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr 1fr 1fr;
+        }
+        .paper-item:last-child {
+            border-bottom: none;
+        }
+        .paper-header {
+            color: #333;
+        }
+        .paper-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Paper Data List</h1>
+
+<div style="display: flex; align-items: center; gap: 10px;">
+    <form method="GET" action="{% url 'pdaq_search' %}" style="display: flex; align-items: center; gap: 5px;">
+        <label for="url_search">关键字搜索:</label>
+        <input type="text" aria-label="pdaq_ip1" id="pdaq_ip1" name="pdaq_ip1" placeholder="请输入关键词1">
+        <input type="text" name="pdaq_ip2" placeholder="请输入关键词2">
+        <input type="text" name="pdaq_ip3" placeholder="请输入关键词3">
+        <input type="text" name="pdaq_ip4" placeholder="请输入关键词4">
+        <input type="text" name="pdaq_ip5" placeholder="请输入关键词5">
+        <input type="date" name="start_date" placeholder="起始日期">
+        <input type="date" name="end_date" placeholder="截止日期">
+        <button type="submit">搜索</button>
+    </form>
+
+    <form method="POST" action="{% url 'clear_paper_data' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" onclick="return confirm('您确定要删除所有数据吗？此操作不可恢复！');">删除数据</button>
+    </form>
+</div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+            <form method="GET" action="{% url 'PDF_URL' %}" style="display: flex; align-items: center; gap: 5px;">
+        <label for="url_search">URL搜索:</label>
+        <input type="text" id="url_search" name="url_search" placeholder="请输入url进行搜索">
+        <button type="submit">搜索</button>
+    </form>
+    </div>
+
+
+    <div class="container">
+        <div class="header">
+            <div>PDF Name</div>
+            <div>Author</div>
+            <div>Abstract</div>
+            <div>PDF URL</div>
+            <div>Details</div> <!-- 修改标题为“Details” -->
+        </div>
+        {% for paper in papers %}
+            <div class="paper-item">
+                <div class="paper-header">{{ paper.pdf_name }}</div>
+                <div class="paper-meta">{{ paper.author }}</div>
+                <div class="paper-meta">{{ paper.abstract }}</div>
+                <div class="paper-meta">
+                    <a href="{{ paper.pdf_url }}" target="_blank">PDF URL</a>
+                </div>
+{#                <button onclick="location.href='{% url 'paper_detail' paper.id %}'">跳转到目标页面</button>#}
+                <button type="button" class="btn btn-outline-secondary"><a href="/detail/?id={{ paper.id }}" style="color: #3c3c3c">翻译</a></button>
+            </div>
+        {% empty %}
+            <p>No papers found.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
