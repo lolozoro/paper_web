@@ -25,6 +25,7 @@ from application01 import views
 
 urlpatterns = [
     re_path(r'^$', views.paper_data_list),
+    re_path(r'^search/', views.display_markdown),
     path('detail/', views.paper_detail),
     path('admin/', admin.site.urls),
     path('clear_papers/', views.clear_paper_data, name='clear_paper_data'),

@@ -28,10 +28,28 @@ def paper_data_list(request):
 def paper_detail(request):
     id = request.GET.get('id')
     # papers = Paper_data.objects.all()
+    # pdf_name = request.GET.get('pdf_name')
     papers = Paper_data.objects.filter(id=id)[0]
+    # context = Paper_data.objects.filter(id).last()
+    transformed_content = papers.transformed
+
+    # 定义 Markdown 文件的路径
+    md_file_path = Path('D:/shix_2024/paper_web/static/file.md')  # 将此处路径替换为实际路径
+
+    # 创建目录（如果不存在的话）
+    md_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # 将内容写入 Markdown 文件
+    with open(md_file_path, 'w', encoding='utf-8') as md_file:
+        md_file.write(transformed_content)
+    # 读取 Markdown 文件内容
+    with open(md_file_path, 'r', encoding='utf-8') as f:
+        md_content = f.read()
+    # 使用 markdown 库将 Markdown 转换为 HTML
+    html_content = markdown.markdown(md_content)
     # papers = get_object_or_404(Paper_data, id=id)
     # tape=papers.values()
-    return render(request, 'paper_detail.html', {'papers': papers})
+    return render(request, 'paper_detail.html', {'papers': papers,'html_content': html_content})
 
 def pdaq_search(request):
     if request.method == 'GET':
@@ -154,12 +172,32 @@ def translate_paper(request):
         # 调用翻译函数，将论文标题传入进行翻译
         # translated_title = translate_text(paper_title)  # 翻译函数的调用
         context = Paper_data.objects.filter(pdf_name=paper_title).last()
+        transformed_content = context.transformed
+
+        # 定义 Markdown 文件的路径
+        md_file_path = Path('D:/shix_2024/paper_web/static/file.md')  # 将此处路径替换为实际路径
+
+        # 创建目录（如果不存在的话）
+        md_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # 将内容写入 Markdown 文件
+        with open(md_file_path, 'w', encoding='utf-8') as md_file:
+            md_file.write(transformed_content)
+        # 读取 Markdown 文件内容
+        with open(md_file_path, 'r', encoding='utf-8') as f:
+            md_content = f.read()
+        # 使用 markdown 库将 Markdown 转换为 HTML
+        html_content = markdown.markdown(md_content)
+        # papers = get_object_or_404(Paper_data, id=id)
+        # tape=papers.values()
+        return render(request, 'paper_detail.html', {'papers': context, 'html_content': html_content})
+
 
         # 模拟翻译，实际使用时应调用翻译服务
         # translated_title = f"翻译的标题: {paper_title}"
 
         # 将翻译后的结果传递到一个结果页面
-        return render(request, 'paper_detail.html', {'papers': context})
+        # return render(request, 'paper_detail.html', {'papers': context})
 
     # 如果不是POST请求，可以显示一个错误页面或重定向
     return render(request, 'paper_detail.html', {'message': '无效请求'})
@@ -192,6 +230,22 @@ def PDF_URL(request):
                     store_url_in_db1(translated_text,related_data.translated_title)
                     related_data = Paper_pdf.objects.filter(pdf_link=pdf_link).last()
                     context = related_data
+                    transformed_content = context.translated
+
+                    # 定义 Markdown 文件的路径
+                    md_file_path = Path('D:/shix_2024/paper_web/static/file1.md')  # 将此处路径替换为实际路径
+
+                    # 创建目录（如果不存在的话）
+                    md_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    # 将内容写入 Markdown 文件
+                    with open(md_file_path, 'w', encoding='utf-8') as md_file:
+                        md_file.write(transformed_content)
+                    # 读取 Markdown 文件内容
+                    with open(md_file_path, 'r', encoding='utf-8') as f:
+                        md_content = f.read()
+                    # 使用 markdown 库将 Markdown 转换为 HTML
+                    html_content = markdown.markdown(md_content)
                 else:
                     context['message'] = '未找到相关数据'
             except Exception as e:
@@ -204,7 +258,39 @@ def PDF_URL(request):
     else:
         context['message'] = '无效请求'
 
-    return render(request, 'paper_pdf.html', {'papers': context})
+    return render(request, 'paper_pdf.html', {'papers': context, 'html_content': html_content})
 
+
+# views.py
+import markdown
+from django.shortcuts import render
+from pathlib import Path
+
+
+def display_markdown(request):
+    # 假设你的 Markdown 文件位于项目根目录下的 'content' 文件夹中
+    # md_file_path = Path('D:/shix_2024/AER-LLM：利用大型语言模型的歧义感知情绪识别/auto/AER-LLM：利用大型语言模型的歧义感知情绪识别.md')
+
+
+    context = Paper_data.objects.filter(pdf_name='重新审视可更新加密中的单向密钥更新').last()
+    transformed_content = context.transformed
+
+    # 定义 Markdown 文件的路径
+    md_file_path = Path('D:/shix_2024/paper_web/static/file.md')  # 将此处路径替换为实际路径
+
+    # 创建目录（如果不存在的话）
+    md_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # 将内容写入 Markdown 文件
+    with open(md_file_path, 'w', encoding='utf-8') as md_file:
+        md_file.write(transformed_content)
+    #读取 Markdown 文件内容
+    with open(md_file_path, 'r', encoding='utf-8') as f:
+        md_content = f.read()
+    # 使用 markdown 库将 Markdown 转换为 HTML
+    html_content = markdown.markdown(md_content)
+
+    # 将 HTML 内容传递给模板
+    return render(request, 'display_markdown.html', {'html_content': html_content})
 
 

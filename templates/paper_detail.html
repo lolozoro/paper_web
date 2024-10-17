@@ -1,5 +1,7 @@
+{#{% load markdown_tags %}#}
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,15 +32,42 @@
             font-size: 16px;
         }
     </style>
+        <!-- 引入 GitHub Flavored Markdown 样式 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+
+    <!-- 引入 MathJax 库 -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
 </head>
 <body>
 
-    <div class="header" id="title">{{ related_data.pdf_name }}</div>
-    <div class="author" id="author">{{ papers.author }}</div>
-    <div class="content" id="abstract">{{ papers.abstract }}</div>
-    <div class="content" id="translation">{{ papers.transformed|linebreaks }}</div>
+{#    <div class="header" id="title">{{ papers.pdf_name }}</div>#}
+{#    <div class="author" id="author">{{ papers.author }}</div>#}
+{#    <div class="content" id="abstract">{{ papers.abstract }}</div>#}
+{#    <div class="content" id="translation">{{ papers.transformed|linebreaks }}</div> <!-- 修改这行 -->#}
+    <div class="content">
+        {{ html_content|safe }}
+    </div>
 
-    <div class="paper-header">{{ message }}</div>
+    <!-- 使用 MathJax 配置 -->
+    <script type="text/javascript">
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                // 启用更多符号包，以支持 LaTeX 中的各种复杂符号
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+
 
 </body>
 </html>
