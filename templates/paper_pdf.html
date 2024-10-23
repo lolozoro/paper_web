@@ -46,8 +46,6 @@
             color: #555555;
         }
     </style>
-        </style>
-        <!-- 引入 GitHub Flavored Markdown 样式 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
 
     <!-- 引入 MathJax 库 -->
@@ -55,22 +53,7 @@
     <script id="MathJax-script" async
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
-</head>
-<body>
-
-    <div class="header" id="title">{{ papers.translated_title }}</div>
-    <div class="author" id="author">{{ papers.translated_authors }}</div>
-    <div class="content" id="abstract">{{ papers.translated_abstract }}</div>
-    <div class="paper-meta">
-        <a href="{{ papers.pdf_link }}" target="_blank">PDF URL</a>
-    </div>
-{#    <div class="translated" id="translated">{{ papers.translated|linebreaks }}</div>#}
-    <div class="paper-header">{{ papers.message }}</div>
-    <div class="content">
-        {{ html_content|safe }}
-    </div>
-
-    <!-- 使用 MathJax 配置 -->
+        <!-- 使用 MathJax 配置 -->
     <script type="text/javascript">
         MathJax = {
             tex: {
@@ -84,6 +67,22 @@
             }
         };
     </script>
+</head>
+<body>
+
+    <div class="header" id="title">{{ papers.translated_title }}</div>
+    <div class="author" id="author">{{ papers.translated_authors }}</div>
+    <div class="content" id="abstract">{{ papers.translated_abstract }}</div>
+    <div class="paper-meta">
+        <a href="{{ papers.pdf_link }}" target="_blank">PDF URL</a>
+    </div>
+{#    <div class="translated" id="translated">{{ papers.translated|linebreaks }}</div>#}
+    <div class="paper-header">{{ papers.message }}</div>
+    <div class="content">
+        {{ html_content|safe|linebreaks }}
+    </div>
+·
+
 
 </body>
 </html>

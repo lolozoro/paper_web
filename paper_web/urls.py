@@ -31,7 +31,7 @@ urlpatterns = [
     path('clear_papers/', views.clear_paper_data, name='clear_paper_data'),
     path('translate/', views.translate_paper, name='translate_paper'),
     path('PDF_URL/', views.PDF_URL, name='PDF_URL'),
-    re_path(r'^pdaq_search/', views.pdaq_search, name='pdaq_search')
+    re_path(r'^pdaq_search/', views.pdaq_search, name='pdaq_search'),
 ]
 
 

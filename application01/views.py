@@ -32,9 +32,11 @@ def paper_detail(request):
     papers = Paper_data.objects.filter(id=id)[0]
     # context = Paper_data.objects.filter(id).last()
     transformed_content = papers.transformed
+    title = papers.pdf_name
 
     # 定义 Markdown 文件的路径
-    md_file_path = Path('D:/shix_2024/paper_web/static/file.md')  # 将此处路径替换为实际路径
+    md_file_name = title + '.md'  # 根据 pdf_name 创建文件名
+    md_file_path = Path(f'D:/shix_2024/paper_web/static/paper_md/{md_file_name}')
 
     # 创建目录（如果不存在的话）
     md_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -46,10 +48,10 @@ def paper_detail(request):
     with open(md_file_path, 'r', encoding='utf-8') as f:
         md_content = f.read()
     # 使用 markdown 库将 Markdown 转换为 HTML
-    html_content = markdown.markdown(md_content)
+    # html_content = markdown.markdown(md_content)
     # papers = get_object_or_404(Paper_data, id=id)
     # tape=papers.values()
-    return render(request, 'paper_detail.html', {'papers': papers,'html_content': html_content})
+    return render(request, 'paper_detail.html', {'papers': papers,'html_content': md_content})
 
 def pdaq_search(request):
     if request.method == 'GET':
@@ -175,7 +177,8 @@ def translate_paper(request):
         transformed_content = context.transformed
 
         # 定义 Markdown 文件的路径
-        md_file_path = Path('D:/shix_2024/paper_web/static/file.md')  # 将此处路径替换为实际路径
+        md_file_name = paper_title + '.md'  # 根据 pdf_name 创建文件名
+        md_file_path = Path(f'D:/shix_2024/paper_web/static/paper_md/{md_file_name}')
 
         # 创建目录（如果不存在的话）
         md_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -187,10 +190,11 @@ def translate_paper(request):
         with open(md_file_path, 'r', encoding='utf-8') as f:
             md_content = f.read()
         # 使用 markdown 库将 Markdown 转换为 HTML
-        html_content = markdown.markdown(md_content)
+
+        # html_content = markdown.markdown(md_content)
         # papers = get_object_or_404(Paper_data, id=id)
         # tape=papers.values()
-        return render(request, 'paper_detail.html', {'papers': context, 'html_content': html_content})
+        return render(request, 'paper_detail.html', {'papers': context, 'html_content': md_content})
 
 
         # 模拟翻译，实际使用时应调用翻译服务
@@ -206,6 +210,7 @@ def translate_paper(request):
 # views.py
 
 def PDF_URL(request):
+    global html_content
     context = {}
     if request.method == 'GET':
         pdf_link = request.GET.get('url_search')
@@ -245,7 +250,7 @@ def PDF_URL(request):
                     with open(md_file_path, 'r', encoding='utf-8') as f:
                         md_content = f.read()
                     # 使用 markdown 库将 Markdown 转换为 HTML
-                    html_content = markdown.markdown(md_content)
+                    # html_content = markdown.markdown(md_content)
                 else:
                     context['message'] = '未找到相关数据'
             except Exception as e:
@@ -258,7 +263,7 @@ def PDF_URL(request):
     else:
         context['message'] = '无效请求'
 
-    return render(request, 'paper_pdf.html', {'papers': context, 'html_content': html_content})
+    return render(request, 'paper_pdf.html', {'papers': context, 'html_content': md_content})
 
 
 # views.py

@@ -41,7 +41,8 @@ import requests
 
 def translate_pdf_content(pdf_path):
     # 定义输出路径
-    output_dir = 'D:/shix_2024'#经过pdf_kit库处理后的文件存放路径
+    global translated_part
+    output_dir = 'D:/shix_2024/paper_web/static/papers'#经过pdf_kit库处理后的文件存放路径
     magic_pdf_command = f'magic-pdf -p "{pdf_path}" -o "{output_dir}"'
 
     try:
@@ -51,14 +52,37 @@ def translate_pdf_content(pdf_path):
         pdf_name = os.path.basename(pdf_path).replace('.PDF', '')  # 获取 PDF 文件名并去掉扩展名
         md_file_path = os.path.join(output_dir, pdf_name, 'auto', f'{pdf_name}.md')  # 拼接出 .md 文件的完整路径
 
-        # 读取 .md 文件内容
         if os.path.exists(md_file_path):
             with open(md_file_path, 'r', encoding='utf-8') as md_file:
                 text = ""
-                for line in md_file:
-                    # 检查当前行是否包含图片语句
-                    if not line.strip().startswith("![]("):
-                        text += line
+                lines = md_file.readlines()  # 将文件的所有行读取到一个列表中
+            for i in range(len(lines)):
+                line = lines[i]
+
+                # 检查当前行是否包含图片语句
+                if line.strip().startswith("![]("):
+                    # 提取图片的路径
+                    start_index = line.find("(") + 1
+                    end_index = line.find(")")
+                    if start_index > 0 and end_index > start_index:
+                        img_path = line[start_index:end_index]
+                        # 将图片语句转换为 HTML <img> 标签
+                        img_html = f'<img src="../static/papers/{pdf_name}/auto/{img_path}" alt="Image" />\n'
+                        text += img_html  # 将 HTML 标签添加到文本中
+                elif lines[i - 1].strip() == "$$" and lines[i + 1].strip() == "$$":  # 确保不越界
+                    continue  # 如果前后行都是"$"，则跳过当前行
+                elif line.strip() == "$$":  # 检查当前行是否为"$"
+                    # 检查当前行后面的两行
+                    if i < len(lines) - 2:  # 确保不越界
+                        second_line = lines[i + 1].strip()  # 第二行
+                        third_line = lines[i + 2].strip()  # 第三行
+                        # 检查第二行是否不为空，并确保第三行是"$"
+                        if second_line and third_line == "$$":  # 如果第二行不为空
+                            # 将前一行、第二行和第三行合并为一行输出
+                            combined_line = f"{lines[i].strip()} {second_line} {third_line}\n"
+                            text += combined_line
+                else:
+                    text += line
 
             # 根据换行符将文本分割成小部分
             parts = text.splitlines()  # 按行分割
@@ -82,9 +106,19 @@ def translate_pdf_content(pdf_path):
                     try:
                         response = requests.post(api_url, headers=headers, data=json.dumps(data))
                         response.raise_for_status()  # 检查请求是否成功
-                        translated_part0 = response.json()["data"]["outputs"]["yuan"]
-                        translated_part1 = response.json()["data"]["outputs"]["text"]
-                        translated_part= f"{translated_part0}\n{translated_part1}"
+
+                        outputs = response.json().get("data", {}).get("outputs", {})
+                        translated_part0 = outputs.get("yuan")
+                        translated_part1 = outputs.get("text")
+
+                        if translated_part0 and translated_part1:  # 当两个都有值时
+                            translated_part = f"{translated_part0}{translated_part1}\n"
+                        elif translated_part0:  # 只有 yuan 有值
+                            translated_part = f"{translated_part0}\n"
+                        elif translated_part1:  # 只有 text 有值
+                            translated_part = f"{translated_part1}\n"
+                        else:  # 两个都没有值
+                            translated_part = "没有返回值"
                     except Exception as e:
                         print(f"翻译过程中发生错误: {e}")
                         translated_part = "翻译失败"

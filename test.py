@@ -1,25 +1,48 @@
-import json
+import os
 
-import requests
 
-api_url = "http://localhost/v1/workflows/run"
-api_key = "app-HjTLvDPziSu8OAvh0umxsOSF"
-headers = {
-    "Authorization": f"Bearer {api_key}",
-    "Content-Type": "application/json"
-}
-part = "There are an increasing number of domains in which artificial intelligence (AI) systems both surpass human ability and accurately model human behavior. This combination of machine mastery over a domain and computational understanding of human behavior in it introduces the possibility of algorithmic ally-informed teaching and learning. AI-powered aids could guide people along reliable and efficient improvement paths, synthesized from their knowledge of both human trajectories and objective performance. Relatable AI partners, on the other hand, could learn to act alongside human counterparts in synergistic and complementary ways."
-data = {
-            "inputs": {'yuan': part},
-            "user": "abc-123"
-        }
-try:
-    response = requests.post(api_url, headers=headers, data=json.dumps(data))
-    response.raise_for_status()  # 检查请求是否成功
-    translated_part0 = response.json()["data"]["outputs"]["yuan"]
-    translated_part1 = response.json()["data"]["outputs"]["text"]
-    combined_translated_part = f"{translated_part0}\n\n{translated_part1}"
-    print(f"翻译结果: {combined_translated_part}")
-except Exception as e:
-    print(f"翻译过程中发生错误: {e}")
-    translated_part = "翻译失败"
+def process_markdown(md_file_path, pdf_name):
+    if os.path.exists(md_file_path):
+        with open(md_file_path, 'r', encoding='utf-8') as md_file:
+            text = ""
+            lines = md_file.readlines()  # 将文件的所有行读取到一个列表中
+
+        for i in range(len(lines)):
+            line = lines[i]
+
+            # 检查当前行是否包含图片语句
+            if line.strip().startswith("![]("):
+                # 提取图片的路径
+                start_index = line.find("(") + 1
+                end_index = line.find(")")
+                if start_index > 0 and end_index > start_index:
+                    img_path = line[start_index:end_index]
+                    # 将图片语句转换为 HTML <img> 标签
+                    img_html = f'<img src="../static/papers/{pdf_name}/auto/{img_path}" alt="Image" />\n'
+                    text += img_html  # 将 HTML 标签添加到文本中
+            elif lines[i - 1].strip() == "$$" and lines[i + 1].strip() == "$$": # 确保不越界
+                continue  # 如果前后行都是"$"，则跳过当前行
+            elif line.strip() == "$$":  # 检查当前行是否为"$"
+                # 检查当前行后面的两行
+                if i < len(lines) - 2:  # 确保不越界
+                    second_line = lines[i + 1].strip()  # 第二行
+                    third_line = lines[i + 2].strip()  # 第三行
+                    # 检查第二行是否不为空，并确保第三行是"$"
+                    if second_line and third_line == "$$":  # 如果第二行不为空
+                        # 将前一行、第二行和第三行合并为一行输出
+                        combined_line = f"{lines[i].strip()} {second_line} {third_line}\n"
+                        text += combined_line
+            else:
+                text += line
+
+        return text  # 返回处理后的文本
+    else:
+        return f"文件 {md_file_path} 不存在。"
+
+
+# 示例调用
+md_file_path = 'D:\shix_2024\paper_web\static\papers\DyVo：用于学习实体稀疏检索的动态词汇\\auto\DyVo：用于学习实体稀疏检索的动态词汇.md'  # 输入的 Markdown 文件路径
+pdf_name = 'example_pdf'  # PDF 名称
+
+processed_text = process_markdown(md_file_path, pdf_name)
+print(processed_text)  # 输出处理后的文本
